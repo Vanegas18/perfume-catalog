@@ -11,8 +11,19 @@ export function Footer() {
           Fragancias de lujo seleccionadas para quienes buscan dejar huella.
         </p>
         <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Juan Jose Vanegas. Todos los derechos
+          © {new Date().getFullYear()} Maison Noir. Todos los derechos
           reservados.
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Desarrollado por{" "}
+          <a
+            href="https://www.vanegassolutions.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-gold underline underline-offset-2 hover:text-gold/80"
+          >
+            Vanegas Solutions
+          </a>
         </p>
       </div>
     </footer>
