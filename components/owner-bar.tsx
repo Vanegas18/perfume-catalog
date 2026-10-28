@@ -11,10 +11,10 @@ export function OwnerBar() {
 
   return (
     <div role="region" aria-label="Panel del dueño" className="on-tinta sticky top-16 z-30 bg-tinta text-hueso">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6 lg:px-10">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-1.5 sm:px-6 lg:px-10">
         <p className="text-sm">
-          <span className="font-semibold">Modo dueño.</span>{' '}
-          <span className="text-niebla">Edite precios y stock en el catálogo. Los cambios quedan en este navegador.</span>
+          <span className="font-semibold">Modo dueño.</span> <span className="text-niebla md:hidden">Se guarda en este navegador.</span>{' '}
+          <span className="hidden text-niebla md:inline">Edite precios y stock en el catálogo. Los cambios quedan en este navegador.</span>
         </p>
         <div className="flex gap-1">
           <Button

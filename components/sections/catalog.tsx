@@ -1,149 +1,112 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useStore } from '@/components/store-provider'
-import { ProductCard } from '@/components/product-card'
-import { ProductForm } from '@/components/product-form'
-import { DeleteConfirmDialog } from '@/components/delete-confirm-dialog'
-import { CATEGORY_LABELS, type Product } from '@/lib/products'
+import { FragranceCard } from '@/components/fragrance-card'
+import { FragranceForm } from '@/components/fragrance-form'
+import { DeleteDialog } from '@/components/delete-dialog'
+import { Scale } from '@/components/gota/scale'
+import { FAMILY_LABELS, type Family, type Fragrance } from '@/lib/products'
 import { cn } from '@/lib/utils'
 
-type Filter = 'todos' | 'mas-vendidos' | 'hombre' | 'mujer' | 'premium'
-
-const FILTERS: { value: Filter; label: string }[] = [
-  { value: 'todos', label: 'Todos' },
-  { value: 'mas-vendidos', label: 'Más vendidos' },
-  { value: 'hombre', label: CATEGORY_LABELS.hombre },
-  { value: 'mujer', label: CATEGORY_LABELS.mujer },
-  { value: 'premium', label: CATEGORY_LABELS.premium },
-]
+type Filter = 'todas' | Family
 
 export function Catalog() {
-  const { products, isAdmin } = useStore()
-  const [filter, setFilter] = useState<Filter>('todos')
-
+  const { fragrances, isOwner, resetCatalog } = useStore()
+  const [filter, setFilter] = useState<Filter>('todas')
   const [formOpen, setFormOpen] = useState(false)
-  const [editing, setEditing] = useState<Product | null>(null)
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const [toDelete, setToDelete] = useState<Product | null>(null)
+  const [editing, setEditing] = useState<Fragrance | null>(null)
+  const [deleting, setDeleting] = useState<Fragrance | null>(null)
 
-  // Sincroniza el filtro con los enlaces del navbar (hash)
-  useEffect(() => {
-    function applyHash() {
-      const hash = window.location.hash.replace('#', '')
-      if (['mas-vendidos', 'hombre', 'mujer', 'premium'].includes(hash)) {
-        setFilter(hash as Filter)
-      } else if (hash === 'catalogo') {
-        setFilter('todos')
-      }
-    }
-    applyHash()
-    window.addEventListener('hashchange', applyHash)
-    return () => window.removeEventListener('hashchange', applyHash)
-  }, [])
-
-  const filtered = useMemo(() => {
-    if (filter === 'todos') return products
-    if (filter === 'mas-vendidos')
-      return products.filter((p) => p.tags.includes('best_seller'))
-    return products.filter((p) => p.category === filter)
-  }, [products, filter])
-
-  function openCreate() {
-    setEditing(null)
-    setFormOpen(true)
-  }
-  function openEdit(product: Product) {
-    setEditing(product)
-    setFormOpen(true)
-  }
-  function openDelete(product: Product) {
-    setToDelete(product)
-    setDeleteOpen(true)
-  }
+  // Solo se muestran familias que existen en el catálogo actual
+  const families = useMemo(
+    () => (Object.keys(FAMILY_LABELS) as Family[]).filter((f) => fragrances.some((x) => x.family === f)),
+    [fragrances],
+  )
+  const list = useMemo(
+    () => [...fragrances].filter((f) => filter === 'todas' || f.family === filter).sort((a, b) => a.code.localeCompare(b.code)),
+    [fragrances, filter],
+  )
 
   return (
-    <section
-      id="catalogo"
-      className="scroll-mt-20 border-y border-border/60 bg-secondary/30"
-    >
-      {/* Anchors para el navbar */}
-      <span id="mas-vendidos" className="block scroll-mt-20" />
-      <span id="hombre" className="block scroll-mt-20" />
-      <span id="mujer" className="block scroll-mt-20" />
-      <span id="premium" className="block scroll-mt-20" />
-
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mb-8 text-center">
-          <h2 className="font-serif text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Nuestra colección
-          </h2>
-          <p className="mt-3 text-muted-foreground">
-            Selecciona tu favorito y consúltanos por WhatsApp
+    <section id="catalogo" aria-labelledby="catalogo-title" className={cn('border-t border-tinta', isOwner ? 'scroll-mt-32' : 'scroll-mt-16')}>
+      <div className="mx-auto max-w-7xl px-4 pt-12 pb-16 sm:px-6 lg:px-10 lg:pt-20 lg:pb-24">
+        <div className="lg:grid lg:grid-cols-12 lg:items-end lg:gap-10">
+          <div className="lg:col-span-5">
+            <p className="num text-xs tracking-[0.12em] text-grafito uppercase">{fragrances.length} fórmulas · 3 tamaños</p>
+            <h2 id="catalogo-title" className="mt-2 text-4xl font-bold tracking-[-0.03em] lg:text-6xl">
+              El catálogo
+            </h2>
+          </div>
+          <p className="mt-3 max-w-md text-grafito lg:col-span-5 lg:col-start-8 lg:mt-0">
+            Elija el tamaño en cada ficha y el pedido llega a WhatsApp con la fragancia, los mililitros y el precio.
           </p>
         </div>
 
-        {/* Filtros */}
-        <div className="mb-10 flex flex-wrap justify-center gap-2">
-          {FILTERS.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={cn(
-                'rounded-full border px-4 py-2 text-sm font-medium transition-colors',
-                filter === f.value
-                  ? 'border-gold bg-gold text-gold-foreground'
-                  : 'border-border bg-card text-muted-foreground hover:border-gold/40 hover:text-foreground',
-              )}
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
+          <div role="group" aria-label="Filtrar por familia" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
+            {(['todas', ...families] as Filter[]).map((f) => (
+              <button
+                key={f}
+                type="button"
+                aria-pressed={filter === f}
+                onClick={() => setFilter(f)}
+                className={cn(
+                  'h-11 shrink-0 cursor-pointer rounded-full border px-4 text-[15px] transition-colors',
+                  filter === f ? 'border-tinta bg-tinta text-hueso' : 'border-tinta/30 hover:border-tinta',
+                )}
+              >
+                {f === 'todas' ? 'Todas' : FAMILY_LABELS[f]}
+              </button>
+            ))}
+          </div>
+          {isOwner && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                setEditing(null)
+                setFormOpen(true)
+              }}
             >
-              {f.label}
-            </button>
-          ))}
+              <Plus className="size-4" /> Agregar fragancia
+            </Button>
+          )}
         </div>
 
-        {/* Grid */}
-        {filtered.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filtered.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onEdit={openEdit}
-                onDelete={openDelete}
+        <Scale className="mt-6 hidden sm:block" />
+
+        {list.length ? (
+          <div className="mt-6 grid sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
+            {list.map((f) => (
+              <FragranceCard
+                key={f.id}
+                fragrance={f}
+                onEdit={(x) => {
+                  setEditing(x)
+                  setFormOpen(true)
+                }}
+                onDelete={setDeleting}
               />
             ))}
           </div>
         ) : (
-          <p className="py-16 text-center text-muted-foreground">
-            No hay productos en esta categoría todavía.
-          </p>
+          <div className="mt-6 border border-dashed border-tinta/40 p-8 text-center">
+            <p className="text-lg font-bold">No hay fragancias en esta familia</p>
+            <p className="mt-1 text-grafito">
+              {fragrances.length ? 'Pruebe con otra familia.' : 'Se quitaron todas. Restaure el catálogo para volver al inicio.'}
+            </p>
+            {!fragrances.length && (
+              <Button variant="outline" className="mt-4" onClick={resetCatalog}>Restaurar catálogo</Button>
+            )}
+          </div>
         )}
       </div>
 
-      {/* Botón flotante de admin: añadir producto */}
-      {isAdmin && (
-        <Button
-          onClick={openCreate}
-          size="icon"
-          className="fixed bottom-24 right-6 z-40 size-14 rounded-full bg-gold text-gold-foreground shadow-lg shadow-gold/30 hover:bg-gold/90"
-          aria-label="Añadir producto"
-        >
-          <Plus className="size-6" />
-        </Button>
-      )}
-
-      <ProductForm
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        product={editing}
-      />
-      <DeleteConfirmDialog
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        product={toDelete}
-      />
+      <FragranceForm open={formOpen} onOpenChange={setFormOpen} fragrance={editing} />
+      <DeleteDialog fragrance={deleting} onClose={() => setDeleting(null)} />
     </section>
   )
 }

@@ -2,6 +2,7 @@ import { StoreProvider } from '@/components/store-provider'
 import { Navbar } from '@/components/navbar'
 import { OwnerBar } from '@/components/owner-bar'
 import { Hero } from '@/components/sections/hero'
+import { Catalog } from '@/components/sections/catalog'
 import { Footer } from '@/components/sections/footer'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -15,6 +16,7 @@ export default function Page() {
       <OwnerBar />
       <main id="contenido">
         <Hero />
+        <Catalog />
       </main>
       <Footer />
       <Toaster position="bottom-center" />
