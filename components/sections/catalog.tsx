@@ -1,15 +1,17 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useStore } from '@/components/store-provider'
 import { FragranceCard } from '@/components/fragrance-card'
-import { FragranceForm } from '@/components/fragrance-form'
-import { DeleteDialog } from '@/components/delete-dialog'
 import { Scale } from '@/components/gota/scale'
 import { FAMILY_LABELS, type Family, type Fragrance } from '@/lib/products'
 import { cn } from '@/lib/utils'
+
+const FragranceForm = dynamic(() => import('@/components/fragrance-form').then((m) => m.FragranceForm))
+const DeleteDialog = dynamic(() => import('@/components/delete-dialog').then((m) => m.DeleteDialog))
 
 type Filter = 'todas' | Family
 
@@ -119,8 +121,8 @@ export function Catalog() {
         )}
       </div>
 
-      <FragranceForm open={formOpen} onOpenChange={setFormOpen} fragrance={editing} />
-      <DeleteDialog fragrance={deleting} onClose={() => setDeleting(null)} />
+      {isOwner && <FragranceForm open={formOpen} onOpenChange={setFormOpen} fragrance={editing} />}
+      {isOwner && <DeleteDialog fragrance={deleting} onClose={() => setDeleting(null)} />}
     </section>
   )
 }

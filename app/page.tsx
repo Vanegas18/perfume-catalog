@@ -6,7 +6,7 @@ import { Catalog } from '@/components/sections/catalog'
 import { HowToOrder } from '@/components/sections/how-to-order'
 import { Footer } from '@/components/sections/footer'
 import { CartProvider } from '@/components/cart-provider'
-import { CartSheet } from '@/components/cart-sheet'
+import { CartSheet } from '@/components/cart-sheet-lazy'
 import { CartBar } from '@/components/cart-bar'
 import { Toaster } from '@/components/ui/sonner'
 

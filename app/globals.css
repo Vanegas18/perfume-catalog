@@ -96,9 +96,9 @@
   }
 }
 
+/* Solo transform: el texto es visible desde el primer pintado (no retrasa el LCP) */
 @keyframes reveal {
   from {
-    opacity: 0;
     transform: translateY(12px);
   }
 }
