@@ -41,7 +41,7 @@ export function Catalog() {
             </h2>
           </div>
           <p className="mt-3 max-w-md text-grafito lg:col-span-5 lg:col-start-8 lg:mt-0">
-            Elija el tamaño en cada ficha y el pedido llega a WhatsApp con la fragancia, los mililitros y el precio.
+            Elija el tamaño, agregue a la bolsa y envíe todo el pedido en un solo mensaje de WhatsApp.
           </p>
         </div>
 

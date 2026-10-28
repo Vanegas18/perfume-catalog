@@ -5,11 +5,15 @@ import { Hero } from '@/components/sections/hero'
 import { Catalog } from '@/components/sections/catalog'
 import { HowToOrder } from '@/components/sections/how-to-order'
 import { Footer } from '@/components/sections/footer'
+import { CartProvider } from '@/components/cart-provider'
+import { CartSheet } from '@/components/cart-sheet'
+import { CartBar } from '@/components/cart-bar'
 import { Toaster } from '@/components/ui/sonner'
 
 export default function Page() {
   return (
     <StoreProvider>
+      <CartProvider>
       <a href="#contenido" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-tinta focus:p-3 focus:text-hueso">
         Saltar al contenido
       </a>
@@ -21,7 +25,10 @@ export default function Page() {
         <HowToOrder />
       </main>
       <Footer />
-      <Toaster position="bottom-center" />
+      <CartSheet />
+      <CartBar />
+      <Toaster position="top-center" />
+      </CartProvider>
     </StoreProvider>
   )
 }

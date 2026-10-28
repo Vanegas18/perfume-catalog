@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, ShoppingBag, X } from 'lucide-react'
+import { useCart } from '@/components/cart-provider'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { useStore } from '@/components/store-provider'
 import { Wordmark } from '@/components/gota/wordmark'
@@ -18,6 +19,7 @@ const NAV_LINKS = [
 export function Navbar() {
   const { isOwner, enterOwnerMode } = useStore()
   const [open, setOpen] = useState(false)
+  const cart = useCart()
 
   return (
     <header className="sticky top-0 z-40 border-b border-linea bg-hueso">
@@ -51,6 +53,20 @@ export function Navbar() {
           >
             <WhatsappIcon className="size-5" />
           </a>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => cart.setOpen(true)}
+            aria-label={`Abrir bolsa, ${cart.count} ${cart.count === 1 ? 'producto' : 'productos'}`}
+            className="relative"
+          >
+            <ShoppingBag />
+            {cart.count > 0 && (
+              <span className="num absolute top-1 right-0.5 flex min-w-5 items-center justify-center rounded-full bg-rojo px-1 text-[11px] leading-5 text-white">
+                {cart.count}
+              </span>
+            )}
+          </Button>
           <Button
             variant="ghost"
             size="icon"

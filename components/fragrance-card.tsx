@@ -4,11 +4,14 @@ import { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { useStore } from '@/components/store-provider'
+import { useCart } from '@/components/cart-provider'
+import { toast } from 'sonner'
+import { ShoppingBag } from 'lucide-react'
 import { FragranceLabel } from '@/components/gota/fragrance-label'
 import { SizeSelector } from '@/components/gota/size-selector'
 import { WhatsappIcon } from '@/components/gota/whatsapp-icon'
 import { FAMILY_LABELS, firstAvailable, formatCOP, pricePerMl, type Fragrance, type SizeMl } from '@/lib/products'
-import { orderLink, restockLink } from '@/lib/whatsapp'
+import { restockLink } from '@/lib/whatsapp'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -19,6 +22,7 @@ interface Props {
 
 export function FragranceCard({ fragrance, onEdit, onDelete }: Props) {
   const { isOwner } = useStore()
+  const { add, setOpen } = useCart()
   const [ml, setMl] = useState<SizeMl>(() => firstAvailable(fragrance).ml)
   const size = fragrance.sizes.find((s) => s.ml === ml) ?? fragrance.sizes[0]
   const soldOut = size.stock <= 0
@@ -73,17 +77,30 @@ export function FragranceCard({ fragrance, onEdit, onDelete }: Props) {
                 </Button>
               </div>
             </div>
-          ) : (
+          ) : soldOut ? (
             <a
-              href={soldOut ? restockLink(fragrance, size) : orderLink(fragrance, size)}
+              href={restockLink(fragrance, size)}
               target="_blank"
               rel="noopener noreferrer"
-              className={cn(buttonVariants({ variant: soldOut ? 'outline' : 'ink', size: 'sm' }), 'mt-3 w-full')}
+              className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'mt-3 w-full')}
             >
-              <WhatsappIcon className="size-4" />
-              {soldOut ? 'Avisarme' : `Pedir ${size.ml} ml`}
-              <span className="sr-only"> de {fragrance.name} por WhatsApp</span>
+              <WhatsappIcon className="size-4" /> Avisarme cuando llegue
             </a>
+          ) : (
+            <Button
+              variant="ink"
+              size="sm"
+              className="mt-3 w-full"
+              onClick={() => {
+                add(fragrance.id, size.ml)
+                toast(`Nº ${fragrance.code} ${fragrance.name} ${size.ml} ml en su bolsa`, {
+                  action: { label: 'Ver bolsa', onClick: () => setOpen(true) },
+                })
+              }}
+            >
+              <ShoppingBag className="size-4" /> Agregar {size.ml} ml
+              <span className="sr-only"> de {fragrance.name} a la bolsa</span>
+            </Button>
           )}
       </div>
     </article>

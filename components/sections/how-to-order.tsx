@@ -9,8 +9,8 @@ const STEPS = [
   },
   {
     n: '02',
-    title: 'Toque “Pedir” y envíe el mensaje',
-    body: 'WhatsApp se abre con el pedido escrito: fragancia, mililitros y precio. Solo agregue su dirección.',
+    title: 'Envíe su bolsa por WhatsApp',
+    body: 'Junte varias fragancias y tamaños. WhatsApp se abre con el pedido escrito y el subtotal. Solo agregue su dirección.',
   },
   {
     n: '03',
@@ -31,7 +31,7 @@ export function HowToOrder() {
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:grid lg:grid-cols-12 lg:gap-10 lg:px-10 lg:py-24">
         <div className="lg:col-span-4">
           <div className="lg:sticky lg:top-28">
-            <p className="num text-xs tracking-[0.12em] text-grafito uppercase">Sin carrito, sin registro</p>
+            <p className="num text-xs tracking-[0.12em] text-grafito uppercase">Sin registro, sin pasarela de pago</p>
             <h2 id="como-pedir-title" className="mt-2 text-4xl font-bold tracking-[-0.03em] lg:text-6xl">
               Cómo pedir
             </h2>
@@ -40,8 +40,11 @@ export function HowToOrder() {
             <figure className="mt-8 max-w-sm">
               <figcaption className="num mb-2 text-xs text-grafito">Así llega su pedido</figcaption>
               <div className="relative rounded-sm rounded-tr-none bg-tinta p-4 text-[15px] leading-snug text-hueso">
-                Hola Gota, quiero pedir Nº 07 Tabaco en 30 ml ({formatCOP(119000)}). ¿Me confirman disponibilidad y el
-                costo del envío?
+                Hola Gota, quiero hacer este pedido:
+                <br />• 1 × Nº 07 Tabaco 30 ml — {formatCOP(119000)}
+                <br />• 2 × Nº 03 Aguacero 5 ml — {formatCOP(54000)}
+                <br />Subtotal: {formatCOP(173000)}
+                <br />¿Me confirman disponibilidad y el costo del envío?
                 <span className="num mt-2 block text-right text-[11px] text-niebla">10:24 a. m.</span>
               </div>
             </figure>
