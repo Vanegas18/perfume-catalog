@@ -3,6 +3,7 @@ import { Navbar } from '@/components/navbar'
 import { OwnerBar } from '@/components/owner-bar'
 import { Hero } from '@/components/sections/hero'
 import { Catalog } from '@/components/sections/catalog'
+import { HowToOrder } from '@/components/sections/how-to-order'
 import { Footer } from '@/components/sections/footer'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -17,6 +18,7 @@ export default function Page() {
       <main id="contenido">
         <Hero />
         <Catalog />
+        <HowToOrder />
       </main>
       <Footer />
       <Toaster position="bottom-center" />

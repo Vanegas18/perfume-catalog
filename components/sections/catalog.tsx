@@ -76,6 +76,20 @@ export function Catalog() {
           )}
         </div>
 
+        {isOwner && (
+          <p className="mt-5 border-l-2 border-rojo pl-3 text-sm text-grafito">
+            Esto es lo que ve el dueño: cambia precios y stock desde el celular, sin programador.{' '}
+            <a
+              href="https://www.vanegassolutions.com/?utm_source=demo&utm_medium=referral&utm_campaign=gota&utm_content=panel"
+              target="_blank"
+              rel="noopener"
+              className="inline-flex min-h-11 items-center font-medium text-tinta underline underline-offset-4"
+            >
+              Quiero uno para mi negocio
+            </a>
+          </p>
+        )}
+
         <Scale className="mt-6 hidden sm:block" />
 
         {list.length ? (
