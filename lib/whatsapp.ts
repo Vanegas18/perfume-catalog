@@ -1,18 +1,25 @@
-import type { Product } from './products'
+import { formatCOP, type Fragrance, type Presentation } from "./products";
 
-// Número de WhatsApp del negocio (formato internacional sin + ni espacios)
-export const WHATSAPP_NUMBER = '3006764605'
+// Formato internacional sin "+": indicativo Colombia (57) + número
+export const WHATSAPP_NUMBER = "573189681599";
+export const BRAND = "Gota";
 
 export function whatsappLink(message: string) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
-export function productInquiryLink(product: Product) {
+export function orderLink(fragrance: Fragrance, size: Presentation) {
   return whatsappLink(
-    `Hola Maison Noir, me interesa la fragancia *${product.name}* ($${product.price}). ¿Está disponible?`,
-  )
+    `Hola ${BRAND}, quiero pedir Nº ${fragrance.code} ${fragrance.name} en ${size.ml} ml (${formatCOP(size.price)}). ¿Me confirman disponibilidad y el costo del envío?`,
+  );
+}
+
+export function restockLink(fragrance: Fragrance, size: Presentation) {
+  return whatsappLink(
+    `Hola ${BRAND}, me interesa Nº ${fragrance.code} ${fragrance.name} en ${size.ml} ml. ¿Me avisan cuando vuelva a estar disponible?`,
+  );
 }
 
 export const GENERAL_INQUIRY = whatsappLink(
-  'Hola Maison Noir, me gustaría recibir asesoría para encontrar mi fragancia ideal.',
-)
+  `Hola ${BRAND}, quiero asesoría para elegir una fragancia. Me gustan los aromas…`,
+);

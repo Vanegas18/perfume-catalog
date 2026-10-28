@@ -1,128 +1,95 @@
 'use client'
 
 import { useState } from 'react'
-import { MessageCircle, Menu, X, ShieldCheck, LogOut } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { Button, buttonVariants } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { useStore } from '@/components/store-provider'
-import { AdminLoginDialog } from '@/components/admin-login-dialog'
+import { Wordmark } from '@/components/gota/wordmark'
+import { WhatsappIcon } from '@/components/gota/whatsapp-icon'
 import { GENERAL_INQUIRY } from '@/lib/whatsapp'
 import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
-  { label: 'Inicio', href: '#inicio' },
   { label: 'Catálogo', href: '#catalogo' },
-  { label: 'Más vendidos', href: '#mas-vendidos' },
-  { label: 'Hombre', href: '#hombre' },
-  { label: 'Mujer', href: '#mujer' },
-  { label: 'Premium', href: '#premium' },
+  { label: 'Cómo pedir', href: '#como-pedir' },
+  { label: 'Visítenos', href: '#visitenos' },
 ]
 
 export function Navbar() {
-  const { isAdmin, logout } = useStore()
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [loginOpen, setLoginOpen] = useState(false)
+  const { isOwner, enterOwnerMode } = useStore()
+  const [open, setOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <a href="#inicio" className="flex items-center gap-2">
-          <span className="font-serif text-xl font-bold tracking-tight text-foreground">
-            Maison <span className="text-gold">Noir</span>
-          </span>
+    <header className="sticky top-0 z-40 border-b border-linea bg-hueso">
+      <nav aria-label="Principal" className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
+        <a href="#inicio" aria-label="Gota, inicio" className="flex min-h-11 items-center">
+          <Wordmark />
         </a>
 
-        <ul className="hidden items-center gap-7 lg:flex">
-          {NAV_LINKS.map((link) => (
-            <li key={link.href}>
-              <a
-                href={link.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-gold"
-              >
-                {link.label}
+        <ul className="hidden items-center gap-8 md:flex">
+          {NAV_LINKS.map((l) => (
+            <li key={l.href}>
+              <a href={l.href} className="inline-flex min-h-11 items-center text-[15px] underline-offset-[6px] hover:underline">
+                {l.label}
               </a>
             </li>
           ))}
         </ul>
 
-        <div className="flex items-center gap-2">
-          {isAdmin && (
-            <Badge className="hidden items-center gap-1 bg-gold/15 text-gold sm:flex">
-              <ShieldCheck className="size-3" />
-              Admin
-            </Badge>
+        <div className="flex items-center gap-1.5">
+          {!isOwner && (
+            <Button variant="outline" size="sm" onClick={enterOwnerMode} className="hidden sm:inline-flex">
+              Probar el panel
+            </Button>
           )}
-
           <a
             href={GENERAL_INQUIRY}
             target="_blank"
-            rel="noreferrer"
-            aria-label="Contactar por WhatsApp"
-            className={cn(
-              buttonVariants({ size: 'icon', variant: 'ghost' }),
-              'text-muted-foreground hover:text-gold',
-            )}
+            rel="noopener noreferrer"
+            aria-label="Escribir a Gota por WhatsApp"
+            className={buttonVariants({ variant: 'ghost', size: 'icon' })}
           >
-            <MessageCircle className="size-5" />
+            <WhatsappIcon className="size-5" />
           </a>
-
-          {isAdmin ? (
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={logout}
-              aria-label="Cerrar sesión de administrador"
-              className="text-muted-foreground hover:text-gold"
-            >
-              <LogOut className="size-5" />
-            </Button>
-          ) : (
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => setLoginOpen(true)}
-              aria-label="Acceso administrador"
-              className="text-muted-foreground hover:text-gold"
-            >
-              <ShieldCheck className="size-5" />
-            </Button>
-          )}
-
           <Button
-            size="icon"
             variant="ghost"
-            className="lg:hidden"
-            onClick={() => setMobileOpen((o) => !o)}
-            aria-label="Abrir menú"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+            aria-controls="menu-movil"
+            aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
           >
-            {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            {open ? <X /> : <Menu />}
           </Button>
         </div>
       </nav>
 
-      {/* Mobile menu */}
-      <div
-        className={cn(
-          'overflow-hidden border-t border-border/60 transition-[max-height] duration-300 lg:hidden',
-          mobileOpen ? 'max-h-96' : 'max-h-0',
-        )}
-      >
-        <ul className="flex flex-col gap-1 px-4 py-3">
-          {NAV_LINKS.map((link) => (
-            <li key={link.href}>
-              <a
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="block rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-gold"
-              >
-                {link.label}
+      <div id="menu-movil" hidden={!open} className="border-t border-linea md:hidden">
+        <ul className="flex flex-col px-4 py-2">
+          {NAV_LINKS.map((l) => (
+            <li key={l.href}>
+              <a href={l.href} onClick={() => setOpen(false)} className="flex min-h-12 items-center border-b border-linea text-lg">
+                {l.label}
               </a>
             </li>
           ))}
+          {!isOwner && (
+            <li className="py-3">
+              <Button
+                variant="outline"
+                className={cn('w-full')}
+                onClick={() => {
+                  enterOwnerMode()
+                  setOpen(false)
+                }}
+              >
+                Probar el panel del dueño
+              </Button>
+            </li>
+          )}
         </ul>
       </div>
-
-      <AdminLoginDialog open={loginOpen} onOpenChange={setLoginOpen} />
     </header>
   )
 }

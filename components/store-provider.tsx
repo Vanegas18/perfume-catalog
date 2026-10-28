@@ -1,74 +1,88 @@
 'use client'
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  type ReactNode,
-} from 'react'
-import { initialProducts, type Product } from '@/lib/products'
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import { initialFragrances, type Fragrance } from '@/lib/products'
+
+/*
+  Demo sin backend: el catálogo vive en el navegador de cada visitante.
+  Cada prospecto puede editar sin afectar a otros, y "Restaurar" vuelve al original.
+  En un proyecto real este contexto se reemplaza por una API (misma interfaz).
+*/
+
+const STORAGE_KEY = 'gota:catalogo:v1'
 
 interface StoreContextValue {
-  products: Product[]
-  isAdmin: boolean
-  login: (user: string, pass: string) => boolean
-  logout: () => void
-  addProduct: (data: Omit<Product, 'id'>) => void
-  updateProduct: (id: string, data: Omit<Product, 'id'>) => void
-  deleteProduct: (id: string) => void
+  fragrances: Fragrance[]
+  isOwner: boolean
+  enterOwnerMode: () => void
+  exitOwnerMode: () => void
+  upsertFragrance: (data: Fragrance) => void
+  deleteFragrance: (id: string) => void
+  resetCatalog: () => void
 }
 
 const StoreContext = createContext<StoreContextValue | null>(null)
 
-// Credenciales simuladas (frontend only)
-const ADMIN_USER = 'admin'
-const ADMIN_PASS = 'admin123'
+function readStored(): Fragrance[] | null {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? (parsed as Fragrance[]) : null
+  } catch {
+    return null
+  }
+}
+
+function writeStored(value: Fragrance[] | null) {
+  try {
+    if (value === null) window.localStorage.removeItem(STORAGE_KEY)
+    else window.localStorage.setItem(STORAGE_KEY, JSON.stringify(value))
+  } catch {
+    // almacenamiento bloqueado (modo privado): el demo sigue funcionando en memoria
+  }
+}
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [products, setProducts] = useState<Product[]>(initialProducts)
-  const [isAdmin, setIsAdmin] = useState(false)
+  const [fragrances, setFragrances] = useState<Fragrance[]>(initialFragrances)
+  const [isOwner, setIsOwner] = useState(false)
+  const [hydrated, setHydrated] = useState(false)
 
-  const login = useCallback((user: string, pass: string) => {
-    if (user === ADMIN_USER && pass === ADMIN_PASS) {
-      setIsAdmin(true)
-      return true
-    }
-    return false
+  useEffect(() => {
+    const stored = readStored()
+    if (stored) setFragrances(stored)
+    setHydrated(true)
   }, [])
 
-  const logout = useCallback(() => setIsAdmin(false), [])
+  useEffect(() => {
+    if (hydrated) writeStored(fragrances)
+  }, [fragrances, hydrated])
 
-  const addProduct = useCallback((data: Omit<Product, 'id'>) => {
-    setProducts((prev) => [
-      { ...data, id: `p${Date.now()}` },
-      ...prev,
-    ])
+  const upsertFragrance = useCallback((data: Fragrance) => {
+    setFragrances((prev) =>
+      prev.some((f) => f.id === data.id) ? prev.map((f) => (f.id === data.id ? data : f)) : [data, ...prev],
+    )
   }, [])
 
-  const updateProduct = useCallback(
-    (id: string, data: Omit<Product, 'id'>) => {
-      setProducts((prev) =>
-        prev.map((p) => (p.id === id ? { ...data, id } : p)),
-      )
-    },
-    [],
-  )
+  const deleteFragrance = useCallback((id: string) => {
+    setFragrances((prev) => prev.filter((f) => f.id !== id))
+  }, [])
 
-  const deleteProduct = useCallback((id: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id))
+  const resetCatalog = useCallback(() => {
+    writeStored(null)
+    setFragrances(initialFragrances)
   }, [])
 
   return (
     <StoreContext.Provider
       value={{
-        products,
-        isAdmin,
-        login,
-        logout,
-        addProduct,
-        updateProduct,
-        deleteProduct,
+        fragrances,
+        isOwner,
+        enterOwnerMode: () => setIsOwner(true),
+        exitOwnerMode: () => setIsOwner(false),
+        upsertFragrance,
+        deleteFragrance,
+        resetCatalog,
       }}
     >
       {children}
@@ -78,6 +92,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
 export function useStore() {
   const ctx = useContext(StoreContext)
-  if (!ctx) throw new Error('useStore must be used within StoreProvider')
+  if (!ctx) throw new Error('useStore debe usarse dentro de StoreProvider')
   return ctx
 }
